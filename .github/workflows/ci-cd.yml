@@ -10,18 +10,18 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python
-      uses: actions/setup-python@v2
-      with:
-        python-version: '3.9'
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-    - name: Run tests
-      run: |
-        pytest
+      - uses: actions/checkout@v2
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.9'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run tests
+        run: |
+          pytest
 
   deploy:
     needs: test
@@ -32,4 +32,12 @@ jobs:
         env:
           RENDER_API_KEY: ${{ secrets.RENDER_API_KEY }}
         run: |
-          curl -X POST https://api.render.com/deploy/srv-YOUR_SERVICE_ID?key=$RENDER_API_KEY
+          echo "Triggering Render deployment..."
+          response=$(curl -s -w "%{http_code}" -o /tmp/render_response.txt -X POST https://api.render.com/deploy/srv-cul7vh3qf0us73bvukp0?key=$RENDER_API_KEY)
+          if [ "$response" -ne 200 ]; then
+            echo "Deployment failed with status code $response"
+            cat /tmp/render_response.txt
+            exit 1
+          else
+            echo "Deployment successful!"
+          fi
