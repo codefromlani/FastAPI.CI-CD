@@ -1,9 +1,0 @@
-services:
-  - type: web
-    name: fastapi-app
-    env: docker
-    buildCommand: docker build -t fastapi-app .
-    startCommand: docker run -p $PORT:80 fastapi-app
-    envVars:
-      - key: PYTHON_VERSION
-        value: 3.9
